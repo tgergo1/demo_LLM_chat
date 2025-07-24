@@ -1,0 +1,274 @@
+{
+  "name": "The SR-71 Story",
+  "pinned": false,
+  "createdAt": 1753378805413,
+  "preset": "",
+  "tokenCount": 1080,
+  "systemPrompt": "",
+  "messages": [
+    {
+      "versions": [
+        {
+          "type": "singleStep",
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "Let's talk about the SR-71"
+            }
+          ]
+        }
+      ],
+      "currentlySelected": 0
+    },
+    {
+      "versions": [
+        {
+          "type": "multiStep",
+          "role": "assistant",
+          "senderInfo": {
+            "senderName": "meta-llama-3.1-8b-instruct"
+          },
+          "steps": [
+            {
+              "type": "contentBlock",
+              "stepIdentifier": "1753378815920-0.6068291953957754",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The Lockheed SR-71 is a supersonic reconnaissance plane developed by the Skunk Works, a secret research and development department of Lockheed Corporation. The SR-71 was designed to evade detection by air defenses, making it an ideal platform for reconnaissance missions.\n\nHere are some impressive facts about the SR-71:\n\n1. **Speed**: The SR-71 is capable of flying at speeds up to Mach 3.56 (around 2,200 mph or 3,540 km/h). This was the highest speed ever achieved by an operational aircraft at that time.\n\n2. **Altitude**: The SR-71 is capable of flying altitudes above 80,000 feet (24,400 meters). This allowed it to escape most air defenses and gather critical intelligence.\n\n3. **Fuel efficiency**: Despite its high speed, the SR-71 is relatively fuel-efficient due to its efficient engines and aerodynamic design.\n\n4. **Durability**: The SR-71 is built with a ruggedized design that allows it to withstand extreme temperatures, turbulence, and damage from potential missile attacks.\n\n5. **Stealth capabilities**: The SR-71's shape, along with a specialized paint job and radar-absorbing materials, made it difficult to detect using radar technology of the 1960s and 1970s.\n\n6. **Sensory equipment**: The SR-71 can carry a variety of sensors, including cameras and radar systems. This data is used to create high-resolution images and gather valuable intelligence.\n\n7. **Original design**: In 1958, a Lockheed engineer named Kelly Johnson created a revolutionary design concept for the SR-71. This innovative design allowed it to achieve its remarkable performance characteristics.\n\nThe SR-71 is often referred to as \"The Sled\" due to its sleek and aerodynamic design. It was operated by the US Air Force from 1962 until 1998, and only a few SR-71 models remain airworthy today.\n\nDo you have any specific questions or topics related to the SR-71 you'd like me to cover?",
+                  "fromDraftModel": false,
+                  "tokensCount": 417
+                }
+              ],
+              "genInfo": {
+                "indexedModelIdentifier": "mlx-community/Meta-Llama-3.1-8B-Instruct-4bit",
+                "identifier": "meta-llama-3.1-8b-instruct",
+                "loadModelConfig": {
+                  "fields": [
+                    {
+                      "key": "llm.load.contextLength",
+                      "value": 4096
+                    }
+                  ]
+                },
+                "predictionConfig": {
+                  "fields": [
+                    {
+                      "key": "llm.prediction.toolCallStopStrings",
+                      "value": [
+                        "<|eom_id|>",
+                        "<|eom|>"
+                      ]
+                    },
+                    {
+                      "key": "llm.prediction.promptTemplate",
+                      "value": {
+                        "type": "jinja",
+                        "jinjaPromptTemplate": {
+                          "template": "{{- bos_token }}\n{%- if custom_tools is defined %}\n    {%- set tools = custom_tools %}\n{%- endif %}\n{%- if not tools_in_user_message is defined %}\n    {%- set tools_in_user_message = true %}\n{%- endif %}\n{%- if not date_string is defined %}\n    {%- set date_string = \"26 Jul 2024\" %}\n{%- endif %}\n{%- if not tools is defined %}\n    {%- set tools = none %}\n{%- endif %}\n\n{#- This block extracts the system message, so we can slot it into the right place. #}\n{%- if messages[0]['role'] == 'system' %}\n    {%- set system_message = messages[0]['content']|trim %}\n    {%- set messages = messages[1:] %}\n{%- else %}\n    {%- set system_message = \"\" %}\n{%- endif %}\n\n{#- System message + builtin tools #}\n{{- \"<|start_header_id|>system<|end_header_id|>\\n\\n\" }}\n{%- if builtin_tools is defined or tools is not none %}\n    {{- \"Environment: ipython\\n\" }}\n{%- endif %}\n{%- if builtin_tools is defined %}\n    {{- \"Tools: \" + builtin_tools | reject('equalto', 'code_interpreter') | join(\", \") + \"\\n\\n\"}}\n{%- endif %}\n{{- \"Cutting Knowledge Date: December 2023\\n\" }}\n{{- \"Today Date: \" + date_string + \"\\n\\n\" }}\n{%- if tools is not none and not tools_in_user_message %}\n    {{- \"You have access to the following functions. To call a function, please respond with JSON for a function call.\" }}\n    {{- 'Respond in the format {\"name\": function name, \"parameters\": dictionary of argument name and its value}.' }}\n    {{- \"Do not use variables.\\n\\n\" }}\n    {%- for t in tools %}\n        {{- t | tojson(indent=4) }}\n        {{- \"\\n\\n\" }}\n    {%- endfor %}\n{%- endif %}\n{{- system_message }}\n{{- \"<|eot_id|>\" }}\n\n{#- Custom tools are passed in a user message with some extra guidance #}\n{%- if tools_in_user_message and not tools is none %}\n    {#- Extract the first user message so we can plug it in here #}\n    {%- if messages | length != 0 %}\n        {%- if messages[0]['content'] is string %}\n      {%- set first_user_message = messages[0]['content']|trim %}\n  {%- else %}\n      {#- expect messages[0]['content'] to be a list of objects #}\n      {%- set first_user_message = messages[0]['content'][0]['text']|trim %}\n  {%- endif %}\n        {%- set messages = messages[1:] %}\n    {%- else %}\n        {{- raise_exception(\"Cannot put tools in the first user message when there's no first user message!\") }}\n{%- endif %}\n    {{- '<|start_header_id|>user<|end_header_id|>\\n\\n' -}}\n    {{- \"You are an expert in using functions/tools when necessary. You are given a query and a set of possible functions. \"}}\n    {{- \"Based on the query, call one or more functions to achieve the purpose, if applicable.\\n\\n\"}}\n    {{- \"If no functions apply, do not call any. Make sure to use any parameters specified as required. \"}}\n    {{- \"If the given query lacks the parameters required by the function, \"}}\n    {{- \"point it out. If a function response is given after you call a function, use it if it answers the query. \"}}\n    {{- \"You should only output function calls in tool call sections.\\n\\n\" }}\n    {{- 'Respond in the format {\"name\": function name, \"parameters\": dictionary of argument names and their values}. ' }}\n    {{- \"For number argument values, you do not need to wrap in quotes. If you use quotes, use double quotes. \"}}\n    {{- \"Do not use variables. Here is a list of the only functions you can invoke, in JSON format.\\n\\n\" }}\n    {%- for t in tools %}\n        {{- t | tojson(indent=4) }}\n        {{- \"\\n\\n\" }}\n    {%- endfor %}\n    {{- first_user_message + \"<|eot_id|>\"}}\n{%- endif %}\n\n{%- for message in messages %}\n    {%- if not (message.role == 'ipython' or message.role == 'tool' or 'tool_calls' in message) %}\n        {{- '<|start_header_id|>' + message['role'] + '<|end_header_id|>\\n\\n'+ message['content'] | trim + '<|eot_id|>' }}\n    {%- elif 'tool_calls' in message %}\n        {%- if not message.tool_calls|length == 1 %}\n            {{- raise_exception(\"This model only supports single tool-calls at once!\") }}\n        {%- endif %}\n        {%- set tool_call = message.tool_calls[0].function %}\n        {%- if builtin_tools is defined and tool_call.name in builtin_tools %}\n            {{- '<|start_header_id|>assistant<|end_header_id|>\\n\\n' -}}\n            {{- \"<|python_tag|>\" + tool_call.name + \".call(\" }}\n            {%- for arg_name, arg_val in tool_call.arguments | items %}\n                {{- arg_name + '=\"' + arg_val + '\"' }}\n                {%- if not loop.last %}\n                    {{- \", \" }}\n                {%- endif %}\n                {%- endfor %}\n            {{- \")\" }}\n        {%- else  %}\n            {{- '<|start_header_id|>assistant<|end_header_id|>\\n\\n' -}}\n            {{- '{\"name\": \"' + tool_call.name + '\", ' }}\n            {{- '\"parameters\": ' }}\n            {{- tool_call.arguments | tojson }}\n            {{- \"}\" }}\n        {%- endif %}\n        {%- if builtin_tools is defined %}\n            {#- This means we're in ipython mode #}\n            {{- \"<|eom_id|>\" }}\n        {%- else %}\n            {{- \"<|eot_id|>\" }}\n        {%- endif %}\n    {%- elif message.role == \"tool\" or message.role == \"ipython\" %}\n        {{- \"<|start_header_id|>ipython<|end_header_id|>\\n\\n\" }}\n        {%- if message.content is iterable and message.content is not string %}\n            {{- message.content | tojson }}\n        {%- else %}\n            {{- message.content }}\n        {%- endif %}\n        {{- \"<|eot_id|>\" }}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|start_header_id|>assistant<|end_header_id|>\\n\\n' }}\n{%- endif %}\n"
+                        },
+                        "stopStrings": []
+                      }
+                    },
+                    {
+                      "key": "llm.prediction.topPSampling",
+                      "value": {
+                        "checked": false,
+                        "value": 1
+                      }
+                    },
+                    {
+                      "key": "llm.prediction.minPSampling",
+                      "value": {
+                        "checked": false,
+                        "value": 0
+                      }
+                    },
+                    {
+                      "key": "llm.prediction.repeatPenalty",
+                      "value": {
+                        "checked": true,
+                        "value": 1.1
+                      }
+                    },
+                    {
+                      "key": "llm.prediction.topKSampling",
+                      "value": 100
+                    },
+                    {
+                      "key": "llm.prediction.tools",
+                      "value": {
+                        "type": "none"
+                      }
+                    }
+                  ]
+                },
+                "stats": {
+                  "stopReason": "eosFound",
+                  "tokensPerSecond": 76.16336579443558,
+                  "numGpuLayers": -1,
+                  "timeToFirstTokenSec": 0.113,
+                  "promptTokensCount": 43,
+                  "predictedTokensCount": 418,
+                  "totalTokensCount": 461
+                }
+              },
+              "defaultShouldIncludeInContext": true,
+              "shouldIncludeInContext": true
+            },
+            {
+              "type": "debugInfoBlock",
+              "stepIdentifier": "1753378821358-0.6019330331070024",
+              "debugInfo": "Conversation naming technique: 'prompt'"
+            }
+          ]
+        }
+      ],
+      "currentlySelected": 0
+    },
+    {
+      "versions": [
+        {
+          "type": "singleStep",
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "What is the \"unknown\" theoretical maximum"
+            }
+          ]
+        }
+      ],
+      "currentlySelected": 0
+    },
+    {
+      "versions": [
+        {
+          "type": "multiStep",
+          "role": "assistant",
+          "senderInfo": {
+            "senderName": "meta-llama-3.1-8b-instruct"
+          },
+          "steps": [
+            {
+              "type": "contentBlock",
+              "stepIdentifier": "1753378845710-0.5839352435865698",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The theoretical maximum speed for an aircraft is often referred to as the \"Law of the Square-Cube\" or the \"Barber's paradox.\" This concept suggests that as an aircraft increases in weight, its required thrust also grows exponentially. However, due to the limitations of materials and aerodynamics, there are physical constraints to an aircraft's acceleration.\n\nOne theoretical upper limit for an aircraft's speed is the \"Sound barrier\" or Mach 1, approximately 768 mph (1,236 km/h) at sea level in standard air conditions. However, due to the density of air, as an aircraft approaches this speed, the drag increases exponentially, making it difficult to reach high speeds in conventional flight.\n\nBreaking through this barrier requires tremendous thrust. As an aircraft reaches and exceeds the sound barrier, the air compresses and creates a shockwave in front of it. This phenomenon is known as \"sonic boom.\"\n\nNow, to reach the theoretical maximum speed for an aircraft involves accelerating through the critical Mach ranges (M=1, 2, and so on). This is where aerodynamic forces become extremely high.\n\nThe most frequently cited theoretical maximum speed for an aircraft is the \"Karman line,\" which represents the boundary between atmospheric flight and spaceflight. This point occurs at about 62 miles (100 kilometers) altitude, where atmospheric pressure is significantly reduced.\n\nThe concept of the theoretical maximum speed for an aircraft often involves understanding one specific plane: The Bell X-1, NASA's X-15 rocket-powered aircraft. These planes that have flown past the Karman Line into space must be propelled through a dense atmosphere for much of their flight.\n\nHowever, if we're to apply this concept purely on aerodynamics and considering just \"aircraft\" in the traditional sense, we look at speeds only achievable via rocket-assisted propulsion or other non-aerial flight vehicles.\n\nWhen discussing theoretical upper limits to an aircraft's speed, we're talking about the concept of \"hypersonic\" speeds or higher, that is approximately Mach 5 and above (approximately 3,700 mph or 6,000 km/h at sea level).",
+                  "fromDraftModel": false,
+                  "tokensCount": 424
+                }
+              ],
+              "genInfo": {
+                "indexedModelIdentifier": "mlx-community/Meta-Llama-3.1-8B-Instruct-4bit",
+                "identifier": "meta-llama-3.1-8b-instruct",
+                "loadModelConfig": {
+                  "fields": [
+                    {
+                      "key": "llm.load.contextLength",
+                      "value": 4096
+                    }
+                  ]
+                },
+                "predictionConfig": {
+                  "fields": [
+                    {
+                      "key": "llm.prediction.toolCallStopStrings",
+                      "value": [
+                        "<|eom_id|>",
+                        "<|eom|>"
+                      ]
+                    },
+                    {
+                      "key": "llm.prediction.promptTemplate",
+                      "value": {
+                        "type": "jinja",
+                        "jinjaPromptTemplate": {
+                          "template": "{{- bos_token }}\n{%- if custom_tools is defined %}\n    {%- set tools = custom_tools %}\n{%- endif %}\n{%- if not tools_in_user_message is defined %}\n    {%- set tools_in_user_message = true %}\n{%- endif %}\n{%- if not date_string is defined %}\n    {%- set date_string = \"26 Jul 2024\" %}\n{%- endif %}\n{%- if not tools is defined %}\n    {%- set tools = none %}\n{%- endif %}\n\n{#- This block extracts the system message, so we can slot it into the right place. #}\n{%- if messages[0]['role'] == 'system' %}\n    {%- set system_message = messages[0]['content']|trim %}\n    {%- set messages = messages[1:] %}\n{%- else %}\n    {%- set system_message = \"\" %}\n{%- endif %}\n\n{#- System message + builtin tools #}\n{{- \"<|start_header_id|>system<|end_header_id|>\\n\\n\" }}\n{%- if builtin_tools is defined or tools is not none %}\n    {{- \"Environment: ipython\\n\" }}\n{%- endif %}\n{%- if builtin_tools is defined %}\n    {{- \"Tools: \" + builtin_tools | reject('equalto', 'code_interpreter') | join(\", \") + \"\\n\\n\"}}\n{%- endif %}\n{{- \"Cutting Knowledge Date: December 2023\\n\" }}\n{{- \"Today Date: \" + date_string + \"\\n\\n\" }}\n{%- if tools is not none and not tools_in_user_message %}\n    {{- \"You have access to the following functions. To call a function, please respond with JSON for a function call.\" }}\n    {{- 'Respond in the format {\"name\": function name, \"parameters\": dictionary of argument name and its value}.' }}\n    {{- \"Do not use variables.\\n\\n\" }}\n    {%- for t in tools %}\n        {{- t | tojson(indent=4) }}\n        {{- \"\\n\\n\" }}\n    {%- endfor %}\n{%- endif %}\n{{- system_message }}\n{{- \"<|eot_id|>\" }}\n\n{#- Custom tools are passed in a user message with some extra guidance #}\n{%- if tools_in_user_message and not tools is none %}\n    {#- Extract the first user message so we can plug it in here #}\n    {%- if messages | length != 0 %}\n        {%- if messages[0]['content'] is string %}\n      {%- set first_user_message = messages[0]['content']|trim %}\n  {%- else %}\n      {#- expect messages[0]['content'] to be a list of objects #}\n      {%- set first_user_message = messages[0]['content'][0]['text']|trim %}\n  {%- endif %}\n        {%- set messages = messages[1:] %}\n    {%- else %}\n        {{- raise_exception(\"Cannot put tools in the first user message when there's no first user message!\") }}\n{%- endif %}\n    {{- '<|start_header_id|>user<|end_header_id|>\\n\\n' -}}\n    {{- \"You are an expert in using functions/tools when necessary. You are given a query and a set of possible functions. \"}}\n    {{- \"Based on the query, call one or more functions to achieve the purpose, if applicable.\\n\\n\"}}\n    {{- \"If no functions apply, do not call any. Make sure to use any parameters specified as required. \"}}\n    {{- \"If the given query lacks the parameters required by the function, \"}}\n    {{- \"point it out. If a function response is given after you call a function, use it if it answers the query. \"}}\n    {{- \"You should only output function calls in tool call sections.\\n\\n\" }}\n    {{- 'Respond in the format {\"name\": function name, \"parameters\": dictionary of argument names and their values}. ' }}\n    {{- \"For number argument values, you do not need to wrap in quotes. If you use quotes, use double quotes. \"}}\n    {{- \"Do not use variables. Here is a list of the only functions you can invoke, in JSON format.\\n\\n\" }}\n    {%- for t in tools %}\n        {{- t | tojson(indent=4) }}\n        {{- \"\\n\\n\" }}\n    {%- endfor %}\n    {{- first_user_message + \"<|eot_id|>\"}}\n{%- endif %}\n\n{%- for message in messages %}\n    {%- if not (message.role == 'ipython' or message.role == 'tool' or 'tool_calls' in message) %}\n        {{- '<|start_header_id|>' + message['role'] + '<|end_header_id|>\\n\\n'+ message['content'] | trim + '<|eot_id|>' }}\n    {%- elif 'tool_calls' in message %}\n        {%- if not message.tool_calls|length == 1 %}\n            {{- raise_exception(\"This model only supports single tool-calls at once!\") }}\n        {%- endif %}\n        {%- set tool_call = message.tool_calls[0].function %}\n        {%- if builtin_tools is defined and tool_call.name in builtin_tools %}\n            {{- '<|start_header_id|>assistant<|end_header_id|>\\n\\n' -}}\n            {{- \"<|python_tag|>\" + tool_call.name + \".call(\" }}\n            {%- for arg_name, arg_val in tool_call.arguments | items %}\n                {{- arg_name + '=\"' + arg_val + '\"' }}\n                {%- if not loop.last %}\n                    {{- \", \" }}\n                {%- endif %}\n                {%- endfor %}\n            {{- \")\" }}\n        {%- else  %}\n            {{- '<|start_header_id|>assistant<|end_header_id|>\\n\\n' -}}\n            {{- '{\"name\": \"' + tool_call.name + '\", ' }}\n            {{- '\"parameters\": ' }}\n            {{- tool_call.arguments | tojson }}\n            {{- \"}\" }}\n        {%- endif %}\n        {%- if builtin_tools is defined %}\n            {#- This means we're in ipython mode #}\n            {{- \"<|eom_id|>\" }}\n        {%- else %}\n            {{- \"<|eot_id|>\" }}\n        {%- endif %}\n    {%- elif message.role == \"tool\" or message.role == \"ipython\" %}\n        {{- \"<|start_header_id|>ipython<|end_header_id|>\\n\\n\" }}\n        {%- if message.content is iterable and message.content is not string %}\n            {{- message.content | tojson }}\n        {%- else %}\n            {{- message.content }}\n        {%- endif %}\n        {{- \"<|eot_id|>\" }}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|start_header_id|>assistant<|end_header_id|>\\n\\n' }}\n{%- endif %}\n"
+                        },
+                        "stopStrings": []
+                      }
+                    },
+                    {
+                      "key": "llm.prediction.topPSampling",
+                      "value": {
+                        "checked": false,
+                        "value": 1
+                      }
+                    },
+                    {
+                      "key": "llm.prediction.minPSampling",
+                      "value": {
+                        "checked": false,
+                        "value": 0
+                      }
+                    },
+                    {
+                      "key": "llm.prediction.repeatPenalty",
+                      "value": {
+                        "checked": true,
+                        "value": 1.1
+                      }
+                    },
+                    {
+                      "key": "llm.prediction.topKSampling",
+                      "value": 100
+                    },
+                    {
+                      "key": "llm.prediction.tools",
+                      "value": {
+                        "type": "none"
+                      }
+                    }
+                  ]
+                },
+                "stats": {
+                  "stopReason": "eosFound",
+                  "tokensPerSecond": 74.6468353975233,
+                  "numGpuLayers": -1,
+                  "timeToFirstTokenSec": 0.119,
+                  "promptTokensCount": 478,
+                  "predictedTokensCount": 425,
+                  "totalTokensCount": 903
+                }
+              },
+              "defaultShouldIncludeInContext": true,
+              "shouldIncludeInContext": true
+            },
+            {
+              "type": "debugInfoBlock",
+              "stepIdentifier": "1753378851378-0.10188738651232965",
+              "debugInfo": "Conversation naming technique: 'prompt'"
+            }
+          ]
+        }
+      ],
+      "currentlySelected": 0
+    }
+  ],
+  "usePerChatPredictionConfig": true,
+  "perChatPredictionConfig": {
+    "fields": []
+  },
+  "clientInput": "I mean for the ",
+  "clientInputFiles": [],
+  "userFilesSizeBytes": 0,
+  "lastUsedModel": {
+    "indexedModelIdentifier": "mlx-community/Meta-Llama-3.1-8B-Instruct-4bit",
+    "identifier": "meta-llama-3.1-8b-instruct",
+    "instanceLoadTimeConfig": {
+      "fields": []
+    },
+    "instanceOperationTimeConfig": {
+      "fields": []
+    }
+  },
+  "notes": [],
+  "plugins": [],
+  "pluginConfigs": {},
+  "disabledPluginTools": [],
+  "looseFiles": []
+}
